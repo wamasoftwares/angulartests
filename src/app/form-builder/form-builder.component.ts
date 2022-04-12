@@ -42,7 +42,6 @@ export class FormBuilderComponent implements OnInit {
     }
     this.addQuestionForm.get('question_type')?.valueChanges.subscribe((val) => {
       if (val == 'check_box') {
-        console.log('in');
         this.options = [];
         this.options = [{ value: '' }, { value: '' }, { value: 'Other' }];
       }
@@ -76,7 +75,6 @@ export class FormBuilderComponent implements OnInit {
         answer: ['', Validators.required],
       });
     }
-    console.log(this.form)
     this.qs.push(qForm);
   }
 
@@ -157,7 +155,14 @@ export class FormBuilderComponent implements OnInit {
         let checkListAns: any = [];
         element.answer.forEach((checklistChecked, i) => {
           if (checklistChecked) {
-            checkListAns.push(this.questions[index]['options'][i]['value']);
+            if(this.questions[index]['options'][i]['value'] == 'Other'){
+              const findIndex = this.findIndexCheckBoxArr(index)
+              if(findIndex > -1){
+                checkListAns.push(this.checkboxArr[findIndex].value)
+              }
+            } else {
+              checkListAns.push(this.questions[index]['options'][i]['value']);
+            }
           }
         });
         this.questions[index]['final_answer'] = checkListAns;
@@ -165,24 +170,40 @@ export class FormBuilderComponent implements OnInit {
         this.questions[index]['final_answer'] = element.answer;
       }
     });
-    console.log(this.questions);
     this.service.questionArray = this.questions;
     this.service.addQuestionForm = this.addQuestionForm;
     this.service.form = this.form;
     this.service.checkboxArr = this.checkboxArr;
-    // this.router.navigate(['form/answer']);
+    this.router.navigate(['form/answer']);
   }
 
+  /**
+   * @ngdoc method
+   * @name otherCheckTick
+   * @description
+   * create/push array based on selection of other selected
+   * @param {number} i
+   */
   otherCheckTick(i: number) {
-    if (this.checkboxArr.includes(i)) {
+    if (this.findIndexCheckBoxArr(i) > -1) {
       this.checkboxArr.splice(
         this.checkboxArr.findIndex((e) => e.index == i),
         1
       );
-      console.log(this.checkboxArr);
     } else {
       this.checkboxArr.push({index: i, value: ''});
-      console.log(this.checkboxArr);
     }
+  }
+
+  /**
+   * @ngdoc method
+   * @name findIndexCheckBoxArr
+   * @description
+   * find index from checkbox Arr(if other selected then need index in order to get value or enable the textbox field)
+   * @param {number} i
+   * @returns {number}
+   */
+  findIndexCheckBoxArr(i){
+    return this.checkboxArr.findIndex((e) => e.index == i)
   }
 }

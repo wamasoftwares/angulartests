@@ -66,8 +66,8 @@
                                 <input type="checkbox" [formControlName]="j" (click)="otherCheckTick(i)">
                                 <span class="ml-1">{{option['value']}}</span>
 
-                                <div *ngIf="checkboxArr.includes(i)">
-                                    <input type="text" placeholder="Please enter your answer" [(ngModel)]="checkboxArr[checkboxArr.findIndex((e) => {if(e == i) {return};} )].value" [ngModelOptions]="{standalone: true}">
+                                <div *ngIf="findIndexCheckBoxArr(i) > -1">
+                                    <input type="text" placeholder="Please enter your answer" [(ngModel)]="checkboxArr[findIndexCheckBoxArr(i)].value" [ngModelOptions]="{standalone: true}">
                                 </div>
 
                             </div>
