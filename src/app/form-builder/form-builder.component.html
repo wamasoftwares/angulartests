@@ -1,0 +1,88 @@
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Add a New Question</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="addQuestionForm" (ngSubmit)="submitForm(modal)">
+        <div class="modal-body">
+            <div class="mb-3">
+                <select class="w-100" formControlName="question_type">
+                    <option value="">Select Question Type</option>
+                    <option value="check_box">Check Box list</option>
+                    <option value="paragraph">Paragraph answer</option>
+                </select>
+                <div class="invalid-feedback" [ngClass]="{'err': submitted}"
+                    *ngIf="f['question_type']?.errors?.['required']">Please Select Answer type.</div>
+            </div>
+            <div class="mb-3 w-100">
+                <input type="text" class="form-control" class="w-100" placeholder="Type Question here"
+                    formControlName="question_name" />
+                <div class="invalid-feedback" [ngClass]="{'err': submitted}"
+                    *ngIf="f['question_name']?.errors?.['required']">Please enter question.</div>
+            </div> 
+            <ng-container *ngIf="addQuestionForm?.value?.question_type == 'check_box'">
+                <div class="mb-2 w-100" *ngFor="let item of options">
+                    <input type="text" class="w-100" placeholder="Add Answer Option" [(ngModel)]="item['value']"
+                        [ngModelOptions]="{standalone: true}" *ngIf="item['value']!=='Other'" />
+                </div>
+
+                <div class="mb-2 w-100" *ngFor="let item of options">
+                    <input type="text" class="w-100" placeholder="Add Answer Option" [(ngModel)]="item['value']"
+                        [ngModelOptions]="{standalone: true}" *ngIf="item['value']==='Other'" disabled />
+                </div>
+
+                <a class="cursor-pointer" (click)="addOptions()">Add another answer</a>
+                <span class="invalid-feedback" [ngClass]="{'err': submitted}" *ngIf="!options?.length">Please add
+                    options.</span>
+
+
+            </ng-container>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-outline-dark">Submit</button>
+        </div>
+    </form>
+</ng-template>
+
+
+<div class="container">
+    <form [formGroup]="form">
+        <div formArrayName="qs">
+            <div *ngFor="let qForm of qs.controls; let i = index">
+                <div [formGroupName]="i">
+                    <p class="mb-0"><b>{{questions[i]['name']}}</b></p>
+                    <textarea *ngIf="questions[i]['type'] != 'check_box'; else checklist" class="w-50"
+                        formControlName="answer"></textarea>
+                    <ng-template #checklist>
+                        <div *ngFor="let option of questions[i]['options']; let j = index" formArrayName="answer">
+                            <div *ngIf="option['value'] !== 'Other' ">
+                                <input type="checkbox" [formControlName]="j">
+                                <span class="ml-1">{{option['value']}}</span>
+                            </div>
+                        </div>
+
+                        <div *ngFor="let option of questions[i]['options']; let j = index" formArrayName="answer">
+                            <div *ngIf="option['value'] === 'Other' ">
+                                <input type="checkbox" [formControlName]="j" (click)="otherCheckTick(i)">
+                                <span class="ml-1">{{option['value']}}</span>
+
+                                <div *ngIf="checkboxArr.includes(i)">
+                                    <input type="text" placeholder="Please enter your answer" [(ngModel)]="checkboxArr[checkboxArr.findIndex((e) => {if(e == i) {return};} )].value" [ngModelOptions]="{standalone: true}">
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="d-flex justify-content-between mt-3">
+        <button type="button" class="btn btn-primary" (click)="open(content)">Add Question</button>
+        <button *ngIf="questions?.length" type="button" class="btn btn-success" (click)="prepareAnswer()">Review
+            Answer</button>
+    </div>
+</div>

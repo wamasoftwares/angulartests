@@ -1,0 +1,8 @@
+<div class="container">
+    <ng-container *ngFor="let item of allQuestions; let i = index;">
+        <p class="mb-0">{{i+1+ '. '}}<b>{{item.name}}</b></p>
+        <p>{{item.final_answer ? item.final_answer : 'Answer Not given'}}</p>
+    </ng-container>
+    <p *ngIf="!allQuestions?.length">Exam is not created</p>
+    <a class="cursor-pointer" (click)="router.navigate(['form/builder'])">Back to Form Builder</a>
+</div>
