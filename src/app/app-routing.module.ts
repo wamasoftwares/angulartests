@@ -4,14 +4,9 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 
 const routes: Routes = [
   {
-    path: 'form/builder',
-    loadChildren: () => import('../app/form-builder/form-builder.module')
-      .then(m => m.FormBuilderModule),
-  },
-  {
-    path: 'form/answer',
-    loadChildren: () => import('../app/review-answer/review-answer.module')
-    .then(m => m.ReviewAnswerModule),
+    path: 'form',
+    loadChildren: () => import('../app/form/form.module')
+      .then(m => m.FormModule),
   },
   {
     path: 'pagenotfound',
@@ -19,7 +14,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'form/builder',
+    redirectTo: 'form',
     pathMatch: 'full'
   },
   {

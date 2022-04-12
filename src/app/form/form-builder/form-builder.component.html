@@ -12,30 +12,32 @@
                     <option value="paragraph">Paragraph answer</option>
                 </select>
                 <div class="invalid-feedback" [ngClass]="{'err': submitted}"
-                    *ngIf="f['question_type']?.errors?.['required']">Please Select Answer type.</div>
+                    *ngIf="f['question_type']?.errors?.['required']">Please Select Answer type.
+                </div>
             </div>
             <div class="mb-3 w-100">
                 <input type="text" class="form-control" class="w-100" placeholder="Type Question here"
                     formControlName="question_name" />
                 <div class="invalid-feedback" [ngClass]="{'err': submitted}"
-                    *ngIf="f['question_name']?.errors?.['required']">Please enter question.</div>
+                    *ngIf="f['question_name']?.errors?.['required']">Please enter question.
+                </div>
             </div> 
             <ng-container *ngIf="addQuestionForm?.value?.question_type == 'check_box'">
                 <div class="mb-2 w-100" *ngFor="let item of options">
                     <input type="text" class="w-100" placeholder="Add Answer Option" [(ngModel)]="item['value']"
                         [ngModelOptions]="{standalone: true}" *ngIf="item['value']!=='Other'" />
                 </div>
+                <div class="invalid-feedback" [ngClass]="{'err': submitted && optionsErr}" *ngIf="optionsErr">Answer options value couldn't be blank.</div>
 
-                <div class="mb-2 w-100" *ngFor="let item of options">
-                    <input type="text" class="w-100" placeholder="Add Answer Option" [(ngModel)]="item['value']"
-                        [ngModelOptions]="{standalone: true}" *ngIf="item['value']==='Other'" disabled />
+                <div>
+                    <input type="checkbox" formControlName="other_checkbox" />
+                    <span class="ml-2">Allow user to specify their own value</span>
                 </div>
 
                 <a class="cursor-pointer" (click)="addOptions()">Add another answer</a>
-                <span class="invalid-feedback" [ngClass]="{'err': submitted}" *ngIf="!options?.length">Please add
-                    options.</span>
-
-
+                <span class="invalid-feedback" [ngClass]="{'err': submitted}" *ngIf="!options?.length">
+                    Please add options.
+                </span>
             </ng-container>
         </div>
         <div class="modal-footer">
@@ -60,7 +62,6 @@
                                 <span class="ml-1">{{option['value']}}</span>
                             </div>
                         </div>
-
                         <div *ngFor="let option of questions[i]['options']; let j = index" formArrayName="answer">
                             <div *ngIf="option['value'] === 'Other' ">
                                 <input type="checkbox" [formControlName]="j" (click)="otherCheckTick(i)">
@@ -72,9 +73,6 @@
 
                             </div>
                         </div>
-
-
-
                     </ng-template>
                 </div>
             </div>
@@ -83,6 +81,7 @@
     <div class="d-flex justify-content-between mt-3">
         <button type="button" class="btn btn-primary" (click)="open(content)">Add Question</button>
         <button *ngIf="questions?.length" type="button" class="btn btn-success" (click)="prepareAnswer()">Review
-            Answer</button>
+            Answer
+        </button>
     </div>
 </div>

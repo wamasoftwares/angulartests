@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SharedServiceService } from '../shared-service.service';
+import { SharedServiceService } from 'src/app/shared-service.service';
 
 @Component({
   selector: 'app-form-builder',
@@ -15,8 +15,9 @@ export class FormBuilderComponent implements OnInit {
   submitted = false;
   form: FormGroup = new FormGroup({});
   questions: Array<object> = [];
-  defaultOptions = [{ value: '' }, { value: '' }, { value: 'Other' }];
+  defaultOptions = [{ value: '' }, { value: '' }];
   checkboxArr: any = [];
+  optionsErr = false;
 
   constructor(
     public modalService: NgbModal,
@@ -30,6 +31,7 @@ export class FormBuilderComponent implements OnInit {
       this.addQuestionForm = this.formBuilder.group({
         question_type: ['', [Validators.required]],
         question_name: ['', [Validators.required]],
+        other_checkbox: [true]
       });
       this.form = this.formBuilder.group({
         qs: this.formBuilder.array([]),
@@ -42,8 +44,9 @@ export class FormBuilderComponent implements OnInit {
     }
     this.addQuestionForm.get('question_type')?.valueChanges.subscribe((val) => {
       if (val == 'check_box') {
+        this.optionsErr = false;
         this.options = [];
-        this.options = [{ value: '' }, { value: '' }, { value: 'Other' }];
+        this.options = [{ value: '' }, { value: '' }];
       }
     });
   }
@@ -64,7 +67,7 @@ export class FormBuilderComponent implements OnInit {
    * @description
    * add question form control
    */
-  addq(question) {
+  addQuestionToForm(question) {
     let qForm;
     if (question.type == 'check_box') {
       qForm = this.formBuilder.group({
@@ -120,15 +123,21 @@ export class FormBuilderComponent implements OnInit {
    * will when need to submit add new question
    */
   submitForm(modal) {
+    this.optionsErr = false;
     this.submitted = true;
     if (this.addQuestionForm.invalid) {
       return;
     }
-    if (
-      this.addQuestionForm.value.question_type == 'check_box' &&
-      !this.options.length
-    ) {
+    if ( this.addQuestionForm.value.question_type == 'check_box' && !this.options.length) {
       return;
+    }
+    const isValueNotAdded = this.options.some((e) => e['value'] == '');
+    if(this.addQuestionForm.value.question_type == 'check_box' && isValueNotAdded){
+      this.optionsErr = true;
+      return;
+    }
+    if(this.addQuestionForm.value.other_checkbox){
+      this.options.push({ value: 'Other' })
     }
     const obj = {
       name: this.addQuestionForm.value.question_name,
@@ -136,7 +145,7 @@ export class FormBuilderComponent implements OnInit {
       options: this.options,
     };
     this.questions.push(obj);
-    this.addq(obj);
+    this.addQuestionToForm(obj);
     this.addQuestionForm.reset();
     this.options = [];
     modal.close('Save click');
